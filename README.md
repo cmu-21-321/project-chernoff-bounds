@@ -1,67 +1,55 @@
 # ChernoffBounds
 
-A template for Lean 4 projects that depend on [Mathlib](https://github.com/leanprover-community/mathlib4).
+Moment-generating functions and multiplicative Chernoff bounds for sums of independent
+Bernoulli random variables, formalized in Lean 4 with [Mathlib](https://github.com/leanprover-community/mathlib4).
+Course project for CMU 21-321.
 
-## Prerequisites
+## Setting
 
-Install Lean via [elan](https://github.com/leanprover/elan) (see the
-[Lean installation guide](https://lean-lang.org/install/)). The correct Lean version is
-picked up automatically from `lean-toolchain`.
+Let $X_1, \dots, X_n$ be independent random variables with $X_i \sim \mathrm{Bernoulli}(p_i)$
+(the success probabilities may differ), and let
 
-## 1. Rename the project
+$$
+S = \sum_i X_i, \qquad \mu = \mathbb{E}[S] = \sum_i p_i .
+$$
 
-After creating your repository from this template, rename it from `ProjectTemplate` to your
-own project name:
+## Main result
+
+For $\mu > 0$ and $\delta > 0$,
+
+$$
+\mathbb{P}\bigl(S \ge (1+\delta)\mu\bigr) \le \exp\Bigl[-\mu\bigl((1+\delta)\log(1+\delta) - \delta\bigr)\Bigr].
+$$
+
+## Proof outline
+
+1. **Bernoulli MGF.** $\mathbb{E}[e^{tX_i}] = 1 - p_i + p_i e^t$.
+2. **MGF of the sum.** By independence, for every real $t$,
+   $\mathbb{E}[e^{tS}] = \prod_i (1 - p_i + p_i e^t) \le \exp\bigl(\mu(e^t - 1)\bigr)$,
+   using $1 + x \le e^x$.
+3. **Exponential Markov inequality.** For $t > 0$,
+   $\mathbb{P}(S \ge a) \le \exp\bigl(-ta + \mu(e^t - 1)\bigr)$.
+4. **Choice of parameters.** Take $a = (1+\delta)\mu$ and $t = \log(1+\delta)$.
+
+Possible extensions: the lower-tail bound, and the simplified quadratic forms of the bounds.
+
+## Status
+
+Work in progress.
+
+## Building
+
+Requires Lean via [elan](https://github.com/leanprover/elan); the Lean version is picked up
+from `lean-toolchain`.
 
 ```bash
-./customize.sh MyProject
-```
-
-This updates `lakefile.toml`, `lake-manifest.json`, the Lean imports and this README's title, and
-renames `ProjectTemplate.lean` and `ProjectTemplate/` to `MyProject.lean` and `MyProject/`.
-The name must be a valid Lean module name (letters, digits and underscores, starting with a
-letter; UpperCamelCase is conventional). Commit the result, then delete `customize.sh`.
-
-## 2. Get the Mathlib cache
-
-Compiling Mathlib from source takes hours, so download the prebuilt files instead:
-
-```bash
-lake exe cache get
-```
-
-Re-run this whenever you change the Mathlib version (or if your editor starts rebuilding
-Mathlib files).
-
-## 3. Build and work on the project
-
-```bash
+lake exe cache get   # download prebuilt Mathlib instead of compiling it
 lake build
 ```
 
-- Put your Lean files under `MyProject/` and import each one from `MyProject.lean`, so that
-  `lake build` (and CI) checks them.
-- Open the repository folder (not a single file) in VS Code with the Lean 4 extension.
+Source files live under `ChernoffBounds/` and are imported from `ChernoffBounds.lean`, so
+`lake build` (and CI, on every push and pull request) checks all of them.
 
-## Updating Mathlib
-
-Change the `rev` under `[[require]]` in `lakefile.toml` to the new Mathlib tag, and set
-`lean-toolchain` to match. Then run:
-
-```bash
-lake update mathlib
-lake exe cache get
-lake build
-```
-
-Alternatively, run the **Update Dependencies** workflow from the GitHub *Actions* tab: it
-opens a pull request if the update builds, or an issue if it doesn't. (Uncomment the
-`schedule` block in `.github/workflows/update.yml` to run it automatically.)
-
-## GitHub setup
-
-- **CI**: every push and pull request is built by `.github/workflows/lean_action_ci.yml`.
-- To let the update workflow open pull requests, go to **Settings → Actions → General** and
-  tick **Allow GitHub Actions to create and approve pull requests**.
-- To publish docs to GitHub Pages, set **Settings → Pages → Source** to "GitHub Actions" and
-  uncomment the `docgen-action` line in `lean_action_ci.yml`.
+To update Mathlib, change `rev` in `lakefile.toml` and `lean-toolchain` to the new tag, then
+run `lake update mathlib && lake exe cache get && lake build` (or run the
+**Update Dependencies** workflow from the Actions tab).
