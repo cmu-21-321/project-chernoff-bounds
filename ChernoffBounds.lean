@@ -1,1 +1,1 @@
-import ChernoffBounds.Basic
+import ChernoffBounds.Statements
