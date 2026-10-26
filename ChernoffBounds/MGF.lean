@@ -4,9 +4,14 @@ import Mathlib.Probability.Moments.Basic
 import Mathlib.Probability.Independence.Integration
 
 /-!
-# Statements for the multiplicative Chernoff bound
+# Moment-generating function of a sum of independent Bernoulli variables
 
-`X i ~ Bernoulli(p i)` independent, `S = ∑ i, X i`, `μ = ∑ i, p i`.-/
+`X i ~ Bernoulli(p i)` independent, `S = ∑ i, X i`, `μ = ∑ i, p i`.
+
+* `mgf_bernoulli`: `M_{X}(t) = 1 - q + q e^t` for `X ~ Bernoulli(q)`.
+* `mgf_sum_bernoulli`: `M_S(t) = ∏ i, (1 - p i + p i e^t)`.
+* `mgf_sum_bernoulli_le`: `M_S(t) ≤ exp (μ (e^t - 1))` for every real `t`.
+-/
 
 open MeasureTheory ProbabilityTheory Real Finset
 
@@ -17,10 +22,6 @@ namespace ChernoffBounds
 /-- The mean `μ = ∑ i, p i` of the sum. -/
 noncomputable def mean {ι : Type*} [Fintype ι] (p : ι → unitInterval) : ℝ :=
   ∑ i, (p i : ℝ) -- sum of all probability, over i, where i is finite.
-
-/-- The exponent in the principal theorem: `(1 + δ) log (1 + δ) - δ`. -/
-noncomputable def chernoffExponent (δ : ℝ) : ℝ :=
-  (1 + δ) * log (1 + δ) - δ
 
 /-! ## Real-analysis lemmas used in step 2 -/
 
@@ -88,25 +89,5 @@ theorem mgf_sum_bernoulli_le (h_indep : iIndepFun X P)
         prod_le_prod₀ (fun i _ ↦ factor_nonneg (p i) t) (fun i _ ↦ factor_le_exp (p i) t)
     _ = exp (mean p * (exp t - 1))
         := by rw [← exp_sum, mean, sum_mul]
-
-
--- TODO: RESTRUCURE MODULES after step 3/4
-
-/-! ## Step 3: exponential Markov -/
-
-/-- Tail bound for a fixed `t > 0`: `P(S ≥ a) ≤ exp (-t a + μ (e^t - 1))`. -/
-theorem measure_sum_ge_le (h_indep : iIndepFun X P)
-    (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P)
-    {t : ℝ} (ht : 0 < t) (a : ℝ) :
-    P.real {ω | a ≤ ∑ i, X i ω} ≤ exp (-t * a + mean p * (exp t - 1)) := by
-  sorry
-
-/-! ## Principal theorem -/
-
-theorem chernoff_upper (h_indep : iIndepFun X P)
-    (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P)
-    {δ : ℝ} (hμ : 0 < mean p) (hδ : 0 < δ) :
-    P.real {ω | (1 + δ) * mean p ≤ ∑ i, X i ω} ≤ exp (-(mean p * chernoffExponent δ)) := by
-  sorry
 
 end ChernoffBounds

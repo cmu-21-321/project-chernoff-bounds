@@ -1,1 +1,2 @@
-import ChernoffBounds.Statements
+import ChernoffBounds.MGF
+import ChernoffBounds.UpperTail
