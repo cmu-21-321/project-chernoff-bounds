@@ -17,12 +17,6 @@ open MeasureTheory ProbabilityTheory Real Finset
 
 namespace ChernoffBounds
 
-/-! ## Definitions -/
-
-/-- The mean `μ = ∑ i, p i` of the sum. -/
-noncomputable def mean {ι : Type*} [Fintype ι] (p : ι → unitInterval) : ℝ :=
-  ∑ i, (p i : ℝ) -- sum of all probability, over i, where i is finite.
-
 /-! ## Real-analysis lemmas used in step 2 -/
 
 /-- Each factor of the product formula is nonnegative. -/
@@ -71,9 +65,8 @@ theorem mgf_bernoulli {Y : Ω → ℝ} {q : unitInterval}
 /-- Product formula: `M_S(t) = ∏ i, (1 - p i + p i * e^t)`. -/
 theorem mgf_sum_bernoulli (h_indep : iIndepFun X P) -- X₁, …, Xₙ independent
     (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P) (t : ℝ) :
-    mgf (fun ω ↦ ∑ i, X i ω) P t = ∏ i, (1 - (p i : ℝ) + p i * exp t) := by
+    mgf (∑ i, X i) P t = ∏ i, (1 - (p i : ℝ) + p i * exp t) := by
   have h := h_indep.mgf_sum₀ (t := t) (fun i ↦ (h_law i).aemeasurable) univ
-  rw [<- Finset.sum_fn]
   rw [h]
   apply Fintype.prod_congr (fun a ↦ mgf (X a) P t) (fun a ↦ 1 - ↑(p a) + ↑(p a) * rexp t)
   intro i
@@ -82,12 +75,12 @@ theorem mgf_sum_bernoulli (h_indep : iIndepFun X P) -- X₁, …, Xₙ independe
 /-- MGF bound `M_S(t) ≤ exp (μ (e^t - 1))`, for every real `t`. -/
 theorem mgf_sum_bernoulli_le (h_indep : iIndepFun X P)
     (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P) (t : ℝ) :
-    mgf (fun ω ↦ ∑ i, X i ω) P t ≤ exp (mean p * (exp t - 1)) := by
+    mgf (∑ i, X i) P t ≤ exp ((∑ i, (p i : ℝ)) * (exp t - 1)) := by
   rw [mgf_sum_bernoulli h_indep h_law]
   calc
     ∏ i, (1 - (p i : ℝ) + p i * exp t) ≤ ∏ i, exp (p i * (exp t - 1)) :=
         prod_le_prod₀ (fun i _ ↦ factor_nonneg (p i) t) (fun i _ ↦ factor_le_exp (p i) t)
-    _ = exp (mean p * (exp t - 1))
-        := by rw [← exp_sum, mean, sum_mul]
+    _ = exp ((∑ i, (p i : ℝ)) * (exp t - 1))
+        := by rw [← exp_sum, sum_mul]
 
 end ChernoffBounds
