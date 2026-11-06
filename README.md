@@ -15,7 +15,7 @@ $$
 
 ## Main result
 
-For $\mu > 0$ and $\delta > 0$,
+For $\delta > 0$,
 
 $$
 \mathbb{P}\bigl(S \ge (1+\delta)\mu\bigr) \le \exp\Bigl[-\mu\bigl((1+\delta)\log(1+\delta) - \delta\bigr)\Bigr].
@@ -35,7 +35,9 @@ Possible extensions: the lower-tail bound, and the simplified quadratic forms of
 
 ## Status
 
-Work in progress.
+The upper-tail bound is fully proved (no `sorry`).
+
+Working on the lower-tail bound.
 
 ## Building
 

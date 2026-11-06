@@ -11,6 +11,7 @@ import Mathlib.Probability.Independence.Integration
 * `mgf_bernoulli`: `M_{X}(t) = 1 - q + q e^t` for `X ~ Bernoulli(q)`.
 * `mgf_sum_bernoulli`: `M_S(t) = ∏ i, (1 - p i + p i e^t)`.
 * `mgf_sum_bernoulli_le`: `M_S(t) ≤ exp (μ (e^t - 1))` for every real `t`.
+* `integrable_exp_mul_sum_bernoulli`: `exp (t S)` is integrable for every real `t`.
 -/
 
 open MeasureTheory ProbabilityTheory Real Finset
@@ -26,6 +27,14 @@ theorem factor_nonneg (p : unitInterval) (t : ℝ) :
   have h2 : 0 ≤ (p : ℝ) := by exact unitInterval.nonneg p
   have h3 : 0 < exp t := by exact exp_pos t
   nlinarith
+
+/-- Each factor of the product formula is strictly positive. -/
+theorem factor_pos (p : unitInterval) (t : ℝ) :
+    0 < 1 - (p : ℝ) + p * exp t := by
+  have h1 : 0 ≤ 1 - (p : ℝ) := unitInterval.one_sub_nonneg p
+  have h2 : 0 ≤ (p : ℝ) := unitInterval.nonneg p
+  have h3 : 0 < exp t := exp_pos t
+  nlinarith [mul_nonneg h1 h3.le, mul_nonneg h2 (mul_pos h3 h3).le]
 
 /-- Each factor of the product formula is bounded by an exponential. -/
 theorem factor_le_exp (p : unitInterval) (t : ℝ) :
@@ -82,5 +91,18 @@ theorem mgf_sum_bernoulli_le (h_indep : iIndepFun X P)
         prod_le_prod₀ (fun i _ ↦ factor_nonneg (p i) t) (fun i _ ↦ factor_le_exp (p i) t)
     _ = exp ((∑ i, (p i : ℝ)) * (exp t - 1))
         := by rw [← exp_sum, sum_mul]
+
+/-- `exp (t S)` is integrable, for every real `t`. The MGF is the integral of `exp (t S)`;
+it is nonzero by the product formula, so the integrand is integrable. -/
+theorem integrable_exp_mul_sum_bernoulli (h_indep : iIndepFun X P)
+    (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P) (t : ℝ) :
+    Integrable (fun ω ↦ exp (t * (∑ i, X i) ω)) P := by
+  apply Integrable.of_integral_ne_zero
+  change mgf (∑ i, X i) P t ≠ 0
+  rw [mgf_sum_bernoulli h_indep h_law]
+  apply ne_of_gt
+  apply prod_pos
+  intro i _
+  exact factor_pos (p i) t
 
 end ChernoffBounds
