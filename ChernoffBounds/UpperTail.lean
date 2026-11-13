@@ -23,7 +23,7 @@ namespace ChernoffBounds
 variable {Ω : Type*} {mΩ : MeasurableSpace Ω} {P : Measure Ω}
 variable {ι : Type*} [Fintype ι] {X : ι → Ω → ℝ} {p : ι → unitInterval}
 
-/-! ## Step 3: exponential Markov -/
+/-! ## Step 3: exponential Markov (Upper Tail) -/
 
 /-- Tail bound for a fixed `t > 0`: `P(S ≥ a) ≤ exp (-t a + μ (e^t - 1))`. -/
 theorem measure_sum_ge_le (h_indep : iIndepFun X P)
@@ -41,7 +41,7 @@ theorem measure_sum_ge_le (h_indep : iIndepFun X P)
         mul_le_mul_of_nonneg_left (mgf_sum_bernoulli_le h_indep h_law t) (exp_pos _).le
     _ = exp (-t * a + (∑ i, (p i : ℝ)) * (exp t - 1)) := (exp_add _ _).symm
 
-/-! ## Principal theorem -/
+/-! ## Principal theorem (Upper Tail) -/
 
 theorem chernoff_upper (h_indep : iIndepFun X P)
     (h_law : ∀ i, HasLaw (X i) (bernoulliMeasure (1 : ℝ) 0 (p i)) P)

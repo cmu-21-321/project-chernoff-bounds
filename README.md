@@ -35,9 +35,7 @@ Possible extensions: the lower-tail bound, and the simplified quadratic forms of
 
 ## Status
 
-The upper-tail bound is fully proved (no `sorry`).
-
-Working on the lower-tail bound.
+The upper-tail bound and the lower-tail bound (for $0 < \delta < 1$) are fully proved (no `sorry`).
 
 ## Building
 
