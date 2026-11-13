@@ -23,10 +23,8 @@ namespace ChernoffBounds
 /-- Each factor of the product formula is nonnegative. -/
 theorem factor_nonneg (p : unitInterval) (t : ℝ) :
     0 ≤ 1 - (p : ℝ) + p * exp t := by
-  have h1 : 0 ≤ 1 - (p : ℝ) := by exact unitInterval.one_sub_nonneg p
-  have h2 : 0 ≤ (p : ℝ) := by exact unitInterval.nonneg p
-  have h3 : 0 < exp t := by exact exp_pos t
-  nlinarith
+  nlinarith [unitInterval.one_sub_nonneg p, unitInterval.nonneg p, exp_pos t]
+  --          0 ≤ 1 - (p : ℝ)               0 ≤ (p : ℝ)            0 < exp t
 
 /-- Each factor of the product formula is strictly positive. -/
 theorem factor_pos (p : unitInterval) (t : ℝ) :
@@ -39,9 +37,7 @@ theorem factor_pos (p : unitInterval) (t : ℝ) :
 /-- Each factor of the product formula is bounded by an exponential. -/
 theorem factor_le_exp (p : unitInterval) (t : ℝ) :
     1 - (p : ℝ) + p * exp t ≤ exp (p * (exp t - 1)) := by
-  have h : 1 - (p : ℝ) + p * exp t = p * (exp t - 1) + 1 := by ring
-  rw [h]
-  exact Real.add_one_le_exp _
+  grind [add_one_le_exp]
 
 /-! ## Setup -/
 
